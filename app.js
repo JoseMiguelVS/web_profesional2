@@ -19,7 +19,7 @@ const prevBtn = document.querySelector("#prevBtn");
 const nextBtn = document.querySelector("#nextBtn");
 const playBtn = document.querySelector("#playBtn");
 
-//Trbajar con el estado de la aplicación
+//Trabajar con el estado de la aplicación
 let currentIndex = 0; //Indice de la imagen actual
 const likes = {}; //Objeto para almacenar los estados de "me gusta" por imagen
 
@@ -33,6 +33,36 @@ function renderThumbs() {
       </article>
     `;
   }).join("");
+};
+
+function renderHero(index) {
+  const item = data[index];
+
+  //Actualizar la imagen principal, título, descripción y contador
+  heroImg.src = item.src;
+  heroImg.alt = item.title;
+
+  //Actualizar el título y la descripción
+  heroTitle.textContent = item.title;
+  heroDesc.textContent = item.desc;
+
+  //Actualizar el contador
+  counter.textContent = `${index + 1} / ${data.length}`;
+
+  //Recorre miniaturas para marcar la activa
+  document.querySelectorAll(".thumb").forEach((thumb, i) =>{
+    thumb.classList.toggle("active", i === index);
+  });
+
+  //Revisar si la imagen actual tiene "me gusta"
+  const isLiked = likes[item.id] === true;
+
+  //Cambiar el simbolo del boton
+  likeBtn.textContent = isLiked ? "❤️" : "🤍";
+
+  //Aplicar o quitar la clase visual
+  likeBtn.classList.toggle("on", isLiked);
+  
 };
 
 //Renderizar la imagen principal
