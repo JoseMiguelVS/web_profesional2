@@ -1,10 +1,10 @@
 const data = [
-  { id: "p01", title: "Aurora", desc: "Luz suave y cielo polar", src: "https://picsum.photos/id/1018/1200/675" },
+  { id: "p01", title: "Nubluado", desc: "Niebla en un bosque", src: "https://picsum.photos/id/630/1200/675" },
   { id: "p02", title: "Montaña", desc: "Rocas y niebla", src: "https://picsum.photos/id/1015/1200/675" },
-  { id: "p03", title: "Ciudad", desc: "Atardecer urbano", src: "https://picsum.photos/id/1011/1200/675" },
-  { id: "p04", title: "Bosque", desc: "Verde profundo", src: "https://picsum.photos/id/1020/1200/675" },
-  { id: "p05", title: "Mar", desc: "Horizonte y calma", src: "https://picsum.photos/id/1016/1200/675" },
-  { id: "p06", title: "Ruta", desc: "Camino en perspectiva", src: "https://picsum.photos/id/1005/1200/675" }
+  { id: "p03", title: "Playa", desc: "Atardecer en el mar", src: "https://picsum.photos/id/100/1200/675" },
+  { id: "p04", title: "Bosque", desc: "Verde profundo", src: "https://picsum.photos/id/10/1200/675" },
+  { id: "p05", title: "Mar", desc: "Horizonte y calma", src: "https://picsum.photos/id/1011/990/675" },
+  { id: "p06", title: "Ruta", desc: "Camino en perspectiva", src: "https://picsum.photos/id/220/1200/675" }
 ];
 
 //Recuperar elementos del DOM
@@ -50,7 +50,7 @@ function renderHero(index) {
   counter.textContent = `${index + 1} / ${data.length}`;
 
   //Recorre miniaturas para marcar la activa
-  document.querySelectorAll(".thumb").forEach((thumb, i) =>{
+  document.querySelectorAll(".thumb").forEach((thumb, i) => {
     thumb.classList.toggle("active", i === index);
   });
 
@@ -62,8 +62,26 @@ function renderHero(index) {
 
   //Aplicar o quitar la clase visual
   likeBtn.classList.toggle("on", isLiked);
-  
 };
 
-//Renderizar la imagen principal
-renderThumbs();
+// Listener para clicks en las miniaturas
+thumbs.addEventListener("click", (e) =>{
+  const thumb = e.target.closest(".thumb");
+  if (!thumb) return; //Si no se hizo click en una miniatura, salir
+  currentIndex = Number(thumb.dataset.index); //Actualizar el índice actual
+  renderHero(currentIndex); //Renderizar la imagen principal con el nuevo índice
+});
+
+likeBtn.addEventListener("click", () => {
+  const currentItem = data[currentIndex];
+  //Alternar el estado de "me gusta" para la imagen actual
+  likes[currentItem.id] = !likes[currentItem.id];
+
+  const isLiked = likes[currentItem.id];
+  likeBtn.textContent = isLiked ? "❤️" : "🤍"; //Actualizar el símbolo del botón
+  likeBtn.classList.toggle("on", isLiked); //Actualizar la clase visual del botón
+  likeBtn.setAttribute("aria-pressed", isLiked); //Actualizar el atributo aria-pressed para accesibilidad
+});
+
+renderThumbs(); //Llamar a la función para mostrar las miniaturas
+renderHero(currentIndex); //Mostrar la imagen principal
