@@ -23,6 +23,10 @@ const playBtn = document.querySelector("#playBtn");
 let currentIndex = 0; //Indice de la imagen actual
 const likes = {}; //Objeto para almacenar los estados de "me gusta" por imagen
 
+let autoPlayId = null; //Variable para almacenar el id de intervalo de autoplay
+let isPlaying = false; //Estado de reproducción automática
+const AUTO_TIME = 1500; //Tiempo entre cambios en autoplay (1.5 segundos)
+
 //Renderizar la gelería de miniaturas
 function renderThumbs() {
   thumbs.innerHTML = data.map((item, index) => {
@@ -82,6 +86,12 @@ likeBtn.addEventListener("click", () => {
   likeBtn.classList.toggle("on", isLiked); //Actualizar la clase visual del botón
   likeBtn.setAttribute("aria-pressed", isLiked); //Actualizar el atributo aria-pressed para accesibilidad
 });
+
+//Cambiar el boton de play a pause y viceversa
+function updatePlayButton(){
+  playBtn.textContent = isPlaying ? "⏸️" : "▶️";
+  playBtn.dataset.state = isPlaying ? "pause" : "play";
+};
 
 renderThumbs(); //Llamar a la función para mostrar las miniaturas
 renderHero(currentIndex); //Mostrar la imagen principal
