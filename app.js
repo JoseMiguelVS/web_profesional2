@@ -1,9 +1,9 @@
 const data = [
-  { id: "p01", title: "Nubluado", desc: "Niebla en un bosque", src: "https://picsum.photos/id/630/1200/675" },
+  { id: "p01", title: "Nublado", desc: "Niebla en un bosque", src: "https://picsum.photos/id/630/1200/675" },
   { id: "p02", title: "Montaña", desc: "Rocas y niebla", src: "https://picsum.photos/id/1015/1200/675" },
   { id: "p03", title: "Playa", desc: "Atardecer en el mar", src: "https://picsum.photos/id/100/1200/675" },
   { id: "p04", title: "Bosque", desc: "Verde profundo", src: "https://picsum.photos/id/10/1200/675" },
-  { id: "p05", title: "Mar", desc: "Horizonte y calma", src: "https://picsum.photos/id/1011/990/675" },
+  { id: "p05", title: "Mar", desc: "Horizonte y calma", src: "https://picsum.photos/id/1011/1200/675" },
   { id: "p06", title: "Ruta", desc: "Camino en perspectiva", src: "https://picsum.photos/id/220/1200/675" }
 ];
 
@@ -89,9 +89,64 @@ likeBtn.addEventListener("click", () => {
 
 //Cambiar el boton de play a pause y viceversa
 function updatePlayButton(){
-  playBtn.textContent = isPlaying ? "⏸️" : "▶️";
+  playBtn.textContent = isPlaying ? "⏸" : "▶";
   playBtn.dataset.state = isPlaying ? "pause" : "play";
 };
+
+function changeSlide( newIndex ){
+  heroImg.classList.add("fade-out"); //Agregar clase de animación
+
+  setTimeout(() =>{
+    currentIndex = newIndex; //Actualizar el índice actual
+    renderHero(currentIndex); //Renderizar la nueva imagen principal
+    heroImg.classList.remove("fade-out"); //Quitar la clase de animación para mostrar la nueva imagen
+  } ,350); //Actualizar el indice actual
+};
+
+function nextSlide(){
+  const newIndex = (currentIndex + 1) % data.length; //Calcular el índice de la siguiente imagen (con wrap-around)
+  changeSlide(newIndex); //Cambiar a la siguiente imagen
+};
+
+function prevSlide(){
+  const newIndex = (currentIndex - 1 + data.length) % data.length; //Calcular el índice de la imagen anterior (con wrap-around)
+  changeSlide(newIndex); //Cambiar a la imagen anterior
+};
+
+function startAutoPlay(){
+  autoPlayId = setInterval(() => {
+    nextSlide(); //Cambiar a la siguiente imagen cada intervalo
+  }, AUTO_TIME);
+  isPlaying = true; //Actualizar el estado de reproducción automática
+  updatePlayButton(); //Actualizar el botón de reproducción para reflejar el nuevo estado
+};
+
+function stopAutoPlay(){
+  clearInterval(autoPlayId); //Detener
+  autoPlayId = null; //Limpiar el id del intervalo
+  isPlaying = false; //Actualizar el estado de reproducción automática
+  updatePlayButton(); //Actualizar el botón de reproducción para reflejar el nuevo estado
+};
+
+function toggleAutoPlay(){
+  if ( isPlaying){
+    stopAutoPlay(); //Si ya se está reproduciendo, detenerlo
+  } else {
+    startAutoPlay(); //Si no se está reproduciendo, iniciarlo
+  }
+};
+
+nextBtn.addEventListener("click", nextSlide); //Listener para el botón de siguiente
+prevBtn.addEventListener("click", prevSlide); //Listener para el botón de anterior
+playBtn.addEventListener("click", toggleAutoPlay); //Listener para el botón de reproducción automática
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") {
+    nextSlide(); //Si se presiona la flecha derecha, ir a la siguiente imagen
+  } else if (e.key === "ArrowLeft") {
+    prevSlide(); //Si se presiona la flecha izquierda, ir a la imagen anterior
+  }
+}); //Listener para eventos de teclado (pendiente de implementación)
 
 renderThumbs(); //Llamar a la función para mostrar las miniaturas
 renderHero(currentIndex); //Mostrar la imagen principal
