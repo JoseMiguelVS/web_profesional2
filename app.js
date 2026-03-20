@@ -8,6 +8,7 @@ const data = [
 ];
 
 //Recuperar elementos del DOM
+const frame = document.querySelector(".frame");
 const thumbs = document.querySelector("#thumbs");
 const heroImg = document.querySelector("#heroImg");
 const heroTitle = document.querySelector("#heroTitle");
@@ -25,7 +26,58 @@ const likes = {}; //Objeto para almacenar los estados de "me gusta" por imagen
 
 let autoPlayId = null; //Variable para almacenar el id de intervalo de autoplay
 let isPlaying = false; //Estado de reproducción automática
-const AUTO_TIME = 1500; //Tiempo entre cambios en autoplay (1.5 segundos)
+const AUTO_TIME = 2500; //Tiempo entre cambios en autoplay (2.5 segundos)
+
+// dost y tracks no existen en el DOM actual
+// se intentan buscar, pero si no estan se crearan usando JS
+let dots = document.querySelector("#dots");
+let track = document.querySelector(".track"); 
+
+// variables para detectar swipe (deslizamiento)
+let startX = 0;
+let currentX = 0;
+let isDragging = false;
+let moved = false;
+//Distancia mínima para considerar un swipe
+const SWIPE_THRESHOLD = 50; 
+
+//crear un tack del carrusel
+//crea un contenedor .tack que tendra todas las imagenes del carrusel, y se movera para mostrar la imagen actual
+function createTrack(){
+  //Si el track ya existe, no hacer nada
+  if(track) return; 
+
+  //si no existe, crear el track
+  track = document.createElement("div");
+  track.classList.add("track");
+
+  data.forEach((item) => {
+    const img = document.createElement("img");
+    img.src = item.src;
+    img.alt = item.title;
+    track.appendChild(img);
+  });
+  frame.prepend(track); //Agregar el track al principio del contenedor del carrusel
+};
+
+//Crear los dots de navegación
+//Cear los botones indicadores del carrusel
+//cada dot representar una imagen
+// el dot activo debe coincidir con el currentIndex
+function createDots(){
+  if ( !dots ){
+    dots = document.createElement("div");
+    dots.id = "dots";
+    dots.className = "dots";
+    frame.appendChild(dots);
+  }
+  dots.innerHTML = data.map((_, index) => { // el _ indica que no se necesita el item, solo el index
+    return `
+    <button class="dot ${index === currentIndex ?? "active"}" type="button"
+    data-index="${index}" aria-label="Ir a la imagen ${index + 1}">
+    </button>`;
+  }).join(""); //Unir los botones en un solo string para insertarlo en el DOM
+};
 
 //Renderizar la gelería de miniaturas
 function renderThumbs() {
