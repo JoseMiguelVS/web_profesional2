@@ -277,6 +277,63 @@ function renderAll(animate = true) {
   updateLikeButton();
 }
 
+// Animate pop del like
+// Agrega o elimina la clase pop para reinciar la animacion CSS al dar click
+function animateLikePop(){
+  likeBtn.classList.remove("pop");
+  void likeBtn.offsetWidth;
+  likeBtn.classList.add("pop");
+};
+
+// Manejo de SWIPE - inicio
+// Registra la posicion inicial del puntero y
+// desactiva temporalmente la transicion del track
+function handlePointerDown(e){
+  startX = e.clientX;
+  currentX = e.clientX;
+  isDragging = true;
+  moved = false;
+
+  if ( track ){
+    track.style.transition = "none";
+  }
+};
+
+// manejo de SWIPE - movimiento
+// actualiza la posicion actual y mueve el track segun la distancia recorrida
+// si el movimiento supera 5px se considera arrastre
+function handlePointerMove (e){
+  if (!isDragging) return;
+
+  currentX = e.clientX;
+  const diff = currentX - startX;
+
+  if ( Math.abs(diff) > 5){
+    moved = true;
+  }
+};
+
+//manejo de SWIPE - fin
+// al soltar el mouse, se calcula la distancia recorrida
+// si supiera el umbral, cambia la imagen
+// si no, solo regresa el track a su sitio
+function handlePointerUp(){
+  if (!isDragging) return;
+
+  isDragging = false;
+  const diff = currentX - startX;
+
+  if (Math.abs(diff) > SWIPE_THRESHOLD){
+    if (diff < 0){
+      nextSlide();
+    }else{
+      prevSlide();
+    }
+  }else{
+    updatetrack(true);
+    }
+};
+
 nextBtn.addEventListener("click", nextSlide); //Listener para el botón de siguiente
 prevBtn.addEventListener("click", prevSlide); //Listener para el botón de anterior
 playBtn.addEventListener("click", toggleAutoPlay); //Listener para el botón de reproducción automática
@@ -288,6 +345,12 @@ document.addEventListener("keydown", (e) => {
     prevSlide(); //Si se presiona la flecha izquierda, ir a la imagen anterior
   }
 }); //Listener para eventos de teclado (pendiente de implementación)
+
+//eventos de swipe con el mouse
+frame.addEventListener("pointerdown", handlePointerDown);
+frame.addEventListener("pointermove", handlePointerMove);
+frame.addEventListener("pointerup", handlePointerUp);
+frame.addEventListener("pointerleave", handlePointerUp);
 
 renderThumbs(); //Llamar a la función para mostrar las miniaturas
 renderHero(currentIndex); //Mostrar la imagen principal
