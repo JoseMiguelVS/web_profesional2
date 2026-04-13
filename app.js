@@ -40,6 +40,7 @@ const data = [
 //Recuperar elementos del DOM
 const frame = document.querySelector(".frame");
 const thumbs = document.querySelector("#thumbs");
+const carrusel = document.querySelector("#carrusel");
 const heroImg = document.querySelector("#heroImg");
 const heroTitle = document.querySelector("#heroTitle");
 const heroDesc = document.querySelector("#heroDesc");
@@ -140,9 +141,22 @@ function updateMeta() {
   counter.textContent = `${currentIndex + 1} / ${data.length}`; //Actualizar el contador
 }
 
+function updateCarrusel(){
+  const item = data[currentIndex]; //Obtener el item actual basado en el currentIndex
+  heroTitle.textContent = item.title; //Actualizar el título
+  heroDesc.textContent = item.desc;
+  counter.textContent = `${currentIndex + 1} / ${data.length}`; //Actualizar el contador  
+}
+
 function updateThumbs() {
   document.querySelectorAll(".thumb").forEach((thumb, index) => {
     thumb.classList.toggle("active", index === currentIndex); //Agregar o quitar la clase "active" según el índice actual
+  });
+}
+
+function updateCarrusel() {
+  document.querySelectorAll(".carrusel").forEach((carrusel, index) => {
+    carrusel.classList.toggle("active", index === currentIndex); //Agregar o quitar la clase "active" según el índice actual
   });
 }
 
@@ -167,6 +181,19 @@ function renderThumbs() {
     .map((item, index) => {
       return `
       <article class="thumb ${index === currentIndex ? "active" : ""}" data-index="${index}">
+        <span class="badge">${index + 1}</span>
+        <img src="${item.src}" alt="${item.title}" />
+      </article>
+    `;
+    })
+    .join("");
+}
+
+function renderCarrusel() {
+  carrusel.innerHTML = data
+    .map((item, index) => {
+      return `
+      <article class="carousel ${index === currentIndex ? "active" : ""}" data-index="${index}">
         <span class="badge">${index + 1}</span>
         <img src="${item.src}" alt="${item.title}" />
       </article>
@@ -209,6 +236,13 @@ thumbs.addEventListener("click", (e) => {
   const thumb = e.target.closest(".thumb");
   if (!thumb) return; //Si no se hizo click en una miniatura, salir
   currentIndex = Number(thumb.dataset.index); //Actualizar el índice actual
+  renderHero(currentIndex); //Renderizar la imagen principal con el nuevo índice
+});
+
+carrusel.addEventListener("click", (e) => {
+  const carousel = e.target.closest(".carousel");
+  if (!carousel) return;
+  currentIndex = Number(carousel.dataset.index); //Actualizar el índice actual
   renderHero(currentIndex); //Renderizar la imagen principal con el nuevo índice
 });
 
@@ -273,13 +307,15 @@ function renderAll(animate = true) {
   updatetrack(animate);
   updateMeta();
   updateThumbs();
+  updateCarrusel();
   updateDots();
   updateLikeButton();
+  updateCarrusel();
 }
 
 // Animate pop del like
 // Agrega o elimina la clase pop para reinciar la animacion CSS al dar click
-function animateLikePop(){
+function animateLikePop() {
   likeBtn.classList.remove("pop");
   void likeBtn.offsetWidth;
   likeBtn.classList.add("pop");
@@ -288,13 +324,13 @@ function animateLikePop(){
 // Manejo de SWIPE - inicio
 // Registra la posicion inicial del puntero y
 // desactiva temporalmente la transicion del track
-function handlePointerDown(e){
+function handlePointerDown(e) {
   startX = e.clientX;
   currentX = e.clientX;
   isDragging = true;
   moved = false;
 
-  if ( track ){
+  if (track) {
     track.style.transition = "none";
   }
 };
@@ -302,13 +338,13 @@ function handlePointerDown(e){
 // manejo de SWIPE - movimiento
 // actualiza la posicion actual y mueve el track segun la distancia recorrida
 // si el movimiento supera 5px se considera arrastre
-function handlePointerMove (e){
+function handlePointerMove(e) {
   if (!isDragging) return;
 
   currentX = e.clientX;
   const diff = currentX - startX;
 
-  if ( Math.abs(diff) > 5){
+  if (Math.abs(diff) > 5) {
     moved = true;
   }
 };
@@ -317,21 +353,21 @@ function handlePointerMove (e){
 // al soltar el mouse, se calcula la distancia recorrida
 // si supiera el umbral, cambia la imagen
 // si no, solo regresa el track a su sitio
-function handlePointerUp(){
+function handlePointerUp() {
   if (!isDragging) return;
 
   isDragging = false;
   const diff = currentX - startX;
 
-  if (Math.abs(diff) > SWIPE_THRESHOLD){
-    if (diff < 0){
+  if (Math.abs(diff) > SWIPE_THRESHOLD) {
+    if (diff < 0) {
       nextSlide();
-    }else{
+    } else {
       prevSlide();
     }
-  }else{
+  } else {
     updatetrack(true);
-    }
+  }
 };
 
 nextBtn.addEventListener("click", nextSlide); //Listener para el botón de siguiente
@@ -353,4 +389,5 @@ frame.addEventListener("pointerup", handlePointerUp);
 frame.addEventListener("pointerleave", handlePointerUp);
 
 renderThumbs(); //Llamar a la función para mostrar las miniaturas
+renderCarrusel();
 renderHero(currentIndex); //Mostrar la imagen principal
